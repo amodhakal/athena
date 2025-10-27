@@ -1,13 +1,21 @@
-from pypdf import PdfReader
+from google.genai.errors import ClientError
+from src.io import read_pdf_contents
+from src.ai import filter_contents
+
 
 INPUT_FILE = "tests/1.pdf"
-OUTPUT_FILE = "tests/output.txt"
 
-reader = PdfReader(INPUT_FILE)
-content = ""
 
-for page in reader.pages:
-    content += page.extract_text()
+def main():
+    content = read_pdf_contents(INPUT_FILE)
+    try:
+        filtered_content = filter_contents(content)
+    except ClientError as client_err:
+        print("Couldn't filter contents: ", client_err)
+        return
 
-with open(OUTPUT_FILE, "w") as f:
-    f.write(content + "\n")
+    print(filtered_content)
+
+
+if __name__ == "__main__":
+    main()
